@@ -1,0 +1,123 @@
+<!doctype html>
+<html lang="es">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>Política de Privacidad — Sueldo en Mano</title>
+<style>
+  :root { color-scheme: light dark; }
+  body {
+    font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    line-height: 1.6; color: #1f2937; background: #ffffff;
+    max-width: 760px; margin: 0 auto; padding: 32px 20px 64px;
+  }
+  h1 { font-size: 1.7rem; margin-bottom: 4px; }
+  h2 { font-size: 1.15rem; margin-top: 32px; color: #111827; }
+  .sub { color: #6b7280; font-size: .95rem; margin-bottom: 24px; }
+  a { color: #2563eb; }
+  ul { padding-left: 1.2rem; }
+  code { background: #f3f4f6; padding: 1px 5px; border-radius: 4px; font-size: .9em; }
+  .box { background: #f8fafc; border: 1px solid #e5e7eb; border-radius: 10px; padding: 12px 16px; }
+  footer { margin-top: 40px; color: #9ca3af; font-size: .85rem; }
+  @media (prefers-color-scheme: dark) {
+    body { background: #0b0f19; color: #e5e7eb; }
+    h2 { color: #f3f4f6; }
+    .box { background: #111827; border-color: #1f2937; }
+    code { background: #1f2937; }
+  }
+</style>
+</head>
+<body>
+  <h1>Política de Privacidad</h1>
+  <div class="sub">Aplicación <strong>Sueldo en Mano</strong> (calculadora de horas extras) · Última actualización: 15 de julio de 2026</div>
+
+  <div class="box">
+    Esta app es <strong>offline-first</strong>: tus datos se guardan <strong>cifrados en tu propio
+    teléfono</strong>. Solo sale información del dispositivo cuando usás las funciones con
+    inteligencia artificial (escaneo del recibo y asistente), y con el único fin de procesarlas.
+  </div>
+
+  <h2>1. Quién es el responsable</h2>
+  <p>
+    Esta aplicación es desarrollada por un particular. Para consultas sobre privacidad o tus datos,
+    escribí a: <a href="mailto:leososa2710@gmail.com">leososa2710@gmail.com</a>.
+  </p>
+
+  <h2>2. Qué datos maneja la app y dónde se guardan</h2>
+  <p>
+    La app te permite cargar y calcular información laboral: sueldo básico, horas extras,
+    asistencia, bonos, descuentos, antigüedad y objetivos personales. Para el acceso, se crea una
+    <strong>cuenta local</strong> con un usuario y una contraseña.
+  </p>
+  <ul>
+    <li>Todos esos datos se almacenan <strong>únicamente en tu dispositivo</strong>, de forma
+      <strong>cifrada</strong> (AES, con una clave guardada en el almacén seguro del sistema).</li>
+    <li>La contraseña <strong>no se guarda en texto plano</strong>: se guarda solo un
+      <em>hash</em> (PBKDF2) con salt, del que no puede recuperarse la contraseña.</li>
+    <li>No tenemos servidores de cuentas: no vemos ni almacenamos tu usuario, contraseña ni tus
+      cálculos.</li>
+  </ul>
+
+  <h2>3. Cámara, fotos y archivos</h2>
+  <p>
+    La app pide permiso de <strong>cámara</strong> y acceso a <strong>fotos/archivos</strong>
+    solamente para que puedas <strong>fotografiar o elegir tu recibo de sueldo</strong> y usar el
+    escaneo con IA. Estos permisos no se usan para ninguna otra finalidad.
+  </p>
+
+  <h2>4. Qué información sale del dispositivo (y cuándo)</h2>
+  <p>
+    La información sale de tu teléfono <strong>solo si usás las funciones de inteligencia
+    artificial</strong>:
+  </p>
+  <ul>
+    <li><strong>Escaneo del recibo:</strong> la imagen o PDF que elijas se envía a nuestro servidor
+      intermedio, que a su vez lo procesa con el servicio de IA para extraer los datos y
+      devolvértelos. La imagen se procesa para esa consulta y <strong>no se almacena de forma
+      permanente</strong> en nuestro servidor.</li>
+    <li><strong>Asistente:</strong> el texto de tu pregunta se envía del mismo modo para generar la
+      respuesta.</li>
+    <li>Junto con la consulta se envía un <strong>identificador aleatorio de la instalación</strong>
+      (no vinculado a tu identidad) para controlar el límite mensual de usos.</li>
+  </ul>
+  <p>Si no usás estas funciones, <strong>ningún dato sale de tu teléfono</strong>.</p>
+
+  <h2>5. Terceros que intervienen (subprocesadores)</h2>
+  <ul>
+    <li><strong>Anthropic</strong> (modelo de IA "Claude"): procesa la imagen del recibo o tu
+      pregunta para devolver el resultado.</li>
+    <li><strong>Render</strong>: aloja el servidor intermedio que reenvía las consultas.</li>
+  </ul>
+  <p>Estos servicios procesan los datos solo para prestar la función solicitada.</p>
+
+  <h2>6. No vendemos tus datos</h2>
+  <p>
+    No vendemos, alquilamos ni compartimos tu información personal con fines publicitarios o
+    comerciales.
+  </p>
+
+  <h2>7. Conservación y borrado</h2>
+  <ul>
+    <li>Como los datos viven en tu teléfono, <strong>desinstalar la app</strong> los elimina.</li>
+    <li>Podés <strong>cerrar sesión</strong> y usar el <strong>respaldo cifrado</strong> (archivo
+      <code>.chx</code>) para mover tu cuenta a otro dispositivo; ese archivo lo controlás vos.</li>
+  </ul>
+
+  <h2>8. Menores de edad</h2>
+  <p>La app está pensada para personas trabajadoras mayores de edad y no está dirigida a menores.</p>
+
+  <h2>9. Cambios en esta política</h2>
+  <p>
+    Si agregamos funciones que cambien el tratamiento de datos (por ejemplo, publicidad o compras
+    dentro de la app), actualizaremos esta política y la fecha de arriba.
+  </p>
+
+  <h2>10. Contacto</h2>
+  <p>Dudas o pedidos sobre tus datos: <a href="mailto:leososa2710@gmail.com">leososa2710@gmail.com</a>.</p>
+
+  <footer>
+    Sueldo en Mano — Política de privacidad. Documento de referencia; adaptalo a tus
+    datos definitivos antes de publicar en Google Play.
+  </footer>
+</body>
+</html>
