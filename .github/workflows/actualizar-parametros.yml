@@ -1,0 +1,48 @@
+name: Actualizar parámetros fiscales
+
+on:
+  schedule:
+    # 1° de cada mes, 12:00 UTC (09:00 Argentina)
+    - cron: "0 12 1 * *"
+  workflow_dispatch:
+    inputs:
+      tope_sipa:
+        description: "Tope SIPA mensual nuevo (ej: 4509567.41). Vacío = no tocar."
+        required: false
+        default: ""
+
+permissions:
+  contents: write
+  pull-requests: write
+
+jobs:
+  actualizar:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependencias
+        run: pip install pdfplumber requests
+
+      - name: Bajar PDFs de ARCA y regenerar parametros.json
+        run: python scripts/actualizar_parametros.py "${{ github.event.inputs.tope_sipa }}"
+
+      - name: Abrir Pull Request si hay cambios
+        uses: peter-evans/create-pull-request@v6
+        with:
+          commit-message: "Parámetros fiscales nuevos (ARCA/ANSES)"
+          title: "📊 Parámetros fiscales nuevos — revisar y aprobar"
+          body: |
+            El robot encontró valores nuevos en los PDFs oficiales de ARCA
+            (y/o un tope SIPA cargado a mano). Ya pasaron la validación
+            matemática (alícuotas, montos fijos que cierran, relación 4,8×).
+
+            **Revisá el diff contra los PDF oficiales y aprobá con Merge.**
+            Al mergear, la pizarra se publica sola y las apps toman los
+            valores nuevos al abrir con internet.
+          branch: robot/parametros-fiscales
+          delete-branch: true

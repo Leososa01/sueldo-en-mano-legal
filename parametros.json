@@ -1,0 +1,69 @@
+{
+  "version": 2,
+  "vigenciaDesde": "2026-07-01",
+  "actualizado": "2026-07-26",
+  "fuentes": {
+    "escala": "https://www.afip.gob.ar/gananciasYBienes/ganancias/personas-humanas-sucesiones-indivisas/declaracion-jurada/documentos/Tabla-Art-94-LIG-per-jul-a-dic-2026.pdf",
+    "deducciones": "https://www.afip.gob.ar/gananciasYBienes/ganancias/personas-humanas-sucesiones-indivisas/deducciones/documentos/Deducciones-personales-art-30-jul-dic-2026.pdf",
+    "topeSipa": "Res. ANSES 186/2026 (julio 2026)"
+  },
+  "ganancias": {
+    "gniAnual": 5585736.93,
+    "deduccionEspecialAnual": 26811537.29,
+    "conyugeAnual": 5260643.86,
+    "hijoAnual": 2652961.9,
+    "hijoIncapacitadoAnual": 5305923.78,
+    "topeAlquilerAnual": 5585736.93,
+    "topeDomesticoAnual": 5585736.93,
+    "escalaAnual": [
+      {
+        "desde": 0,
+        "fijo": 0,
+        "alicuota": 0.05
+      },
+      {
+        "desde": 2168491.89,
+        "fijo": 108424.59,
+        "alicuota": 0.09
+      },
+      {
+        "desde": 4336983.77,
+        "fijo": 303588.86,
+        "alicuota": 0.12
+      },
+      {
+        "desde": 6505475.65,
+        "fijo": 563807.89,
+        "alicuota": 0.15
+      },
+      {
+        "desde": 9758213.49,
+        "fijo": 1051718.57,
+        "alicuota": 0.19
+      },
+      {
+        "desde": 19516426.99,
+        "fijo": 2905779.13,
+        "alicuota": 0.23
+      },
+      {
+        "desde": 29274640.48,
+        "fijo": 5150168.23,
+        "alicuota": 0.27
+      },
+      {
+        "desde": 43911960.73,
+        "fijo": 9102244.7,
+        "alicuota": 0.31
+      },
+      {
+        "desde": 65867941.1,
+        "fijo": 15908598.62,
+        "alicuota": 0.35
+      }
+    ]
+  },
+  "aportes": {
+    "baseImponibleTope": 4509567.41
+  }
+}
