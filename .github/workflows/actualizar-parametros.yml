@@ -2,8 +2,9 @@ name: Actualizar parámetros fiscales
 
 on:
   schedule:
-    # 1° de cada mes, 12:00 UTC (09:00 Argentina)
-    - cron: "0 12 1 * *"
+    # Todos los lunes, 12:00 UTC (09:00 Argentina). Solo abre PR si hay
+    # valores nuevos: las semanas sin novedades no hacen nada.
+    - cron: "0 12 * * 1"
   workflow_dispatch:
     inputs:
       tope_sipa:
