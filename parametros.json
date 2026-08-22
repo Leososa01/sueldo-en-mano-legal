@@ -1,11 +1,11 @@
 {
-  "version": 3,
+  "version": 4,
   "vigenciaDesde": "2026-07-01",
   "actualizado": "2026-08-22",
   "fuentes": {
     "escala": "https://www.afip.gob.ar/gananciasYBienes/ganancias/personas-humanas-sucesiones-indivisas/declaracion-jurada/documentos/Tabla-Art-94-LIG-per-jul-a-dic-2026.pdf",
     "deducciones": "https://www.afip.gob.ar/gananciasYBienes/ganancias/personas-humanas-sucesiones-indivisas/deducciones/documentos/Deducciones-personales-art-30-jul-dic-2026.pdf",
-    "topeSipa": "Res. ANSES 186/2026 (julio 2026)",
+    "topeSipa": "Res. ANSES 232/2026 (agosto 2026, movilidad 1,89%)",
     "topeSeguroVida": "Art. 85 inc. b LIG - tope anual del periodo fiscal 2026 (se actualiza por IPC cada anio fiscal)"
   },
   "ganancias": {
@@ -66,6 +66,7 @@
     ]
   },
   "aportes": {
-    "baseImponibleTope": 4509567.41
+    "baseImponibleTope": 4594798.23,
+    "vigenciaDesde": "2026-08-01"
   }
 }

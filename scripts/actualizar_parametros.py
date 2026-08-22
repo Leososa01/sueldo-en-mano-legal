@@ -148,7 +148,13 @@ def main():
     hoy = date.today()
     url_escala, url_deducciones, proyectar = urls_semestre(hoy)
     # Tope SIPA opcional por línea de comandos (workflow_dispatch manual).
+    # 1er argumento: el tope. 2do (opcional): desde qué mes rige, "AAAA-MM".
+    # Por defecto el mes de hoy — pasalo a mano si cargás el tope tarde (el de
+    # agosto publicado el 2 de septiembre tiene que quedar como agosto).
     tope_manual = float(sys.argv[1]) if len(sys.argv) > 1 and sys.argv[1] else None
+    mes_tope = sys.argv[2] if len(sys.argv) > 2 and sys.argv[2] else hoy.strftime("%Y-%m")
+    if not re.fullmatch(r"\d{4}-\d{2}", mes_tope):
+        raise RuntimeError(f"El mes del tope tiene que ser AAAA-MM, vino: {mes_tope}")
 
     with open("parametros.json", encoding="utf-8") as f:
         actual = json.load(f)
@@ -165,7 +171,15 @@ def main():
     # app cae a su valor de fábrica sin avisar nada.
     nuevo["ganancias"] = dict(actual.get("ganancias", {}), **deducciones, escalaAnual=escala)
     if tope_manual:
-        nuevo["aportes"] = {"baseImponibleTope": tope_manual}
+        # El tope del SIPA lleva su PROPIA fecha: ANSES lo mueve todos los meses,
+        # mientras que el `vigenciaDesde` de abajo es el de las tablas de ARCA,
+        # que cambian por semestre. La app archiva el tope en el mes que dice acá
+        # para armar el historial que necesita Ganancias; si compartieran fecha,
+        # los seis topes del semestre se pisarían entre ellos.
+        nuevo["aportes"] = {
+            "baseImponibleTope": tope_manual,
+            "vigenciaDesde": f"{mes_tope}-01",
+        }
     nuevo["fuentes"] = dict(actual.get("fuentes", {}), escala=url_escala, deducciones=url_deducciones)
 
     sin_meta_actual = {k: v for k, v in actual.items() if k not in ("version", "actualizado")}

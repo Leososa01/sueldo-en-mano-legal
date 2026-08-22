@@ -8,7 +8,11 @@ on:
   workflow_dispatch:
     inputs:
       tope_sipa:
-        description: "Tope SIPA mensual nuevo (ej: 4509567.41). Vacío = no tocar."
+        description: "Tope SIPA mensual nuevo (ej: 4594798.23). Vacío = no tocar."
+        required: false
+        default: ""
+      mes_tope:
+        description: "Desde qué mes rige ese tope, AAAA-MM (ej: 2026-08). Vacío = el mes de hoy."
         required: false
         default: ""
 
@@ -30,7 +34,10 @@ jobs:
         run: pip install pdfplumber requests
 
       - name: Bajar PDFs de ARCA y regenerar parametros.json
-        run: python scripts/actualizar_parametros.py "${{ github.event.inputs.tope_sipa }}"
+        run: >-
+          python scripts/actualizar_parametros.py
+          "${{ github.event.inputs.tope_sipa }}"
+          "${{ github.event.inputs.mes_tope }}"
 
       - name: Abrir Pull Request si hay cambios
         uses: peter-evans/create-pull-request@v6
