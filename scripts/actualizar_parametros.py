@@ -157,7 +157,13 @@ def main():
     deducciones = extraer_deducciones(bajar(url_deducciones), proyectar)
 
     nuevo = dict(actual)
-    nuevo["ganancias"] = dict(deducciones, escalaAnual=escala)
+    # OJO: se PARTE de las ganancias actuales y recién encima se pisan las que el
+    # robot sabe leer. Si se reemplazara el objeto entero, cada corrida borraría
+    # los campos que este script NO extrae de los PDF de ARCA — hoy
+    # `topeSeguroVidaAnual` (art. 85 inc. b, que vive en otra tabla y se carga a
+    # mano). Sería un bug silencioso: la corrida del lunes borra el campo y la
+    # app cae a su valor de fábrica sin avisar nada.
+    nuevo["ganancias"] = dict(actual.get("ganancias", {}), **deducciones, escalaAnual=escala)
     if tope_manual:
         nuevo["aportes"] = {"baseImponibleTope": tope_manual}
     nuevo["fuentes"] = dict(actual.get("fuentes", {}), escala=url_escala, deducciones=url_deducciones)
