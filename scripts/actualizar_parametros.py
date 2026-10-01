@@ -176,9 +176,14 @@ def main():
         # que cambian por semestre. La app archiva el tope en el mes que dice acá
         # para armar el historial que necesita Ganancias; si compartieran fecha,
         # los seis topes del semestre se pisarían entre ellos.
+        # Se conserva `historico` (lo arma el robot del tope, scripts/tope_sipa.py)
+        # y se le suma este mes: reemplazar el objeto entero lo borraba.
+        historico = dict((actual.get("aportes") or {}).get("historico") or {})
+        historico[mes_tope] = tope_manual
         nuevo["aportes"] = {
             "baseImponibleTope": tope_manual,
             "vigenciaDesde": f"{mes_tope}-01",
+            "historico": dict(sorted(historico.items())),
         }
     nuevo["fuentes"] = dict(actual.get("fuentes", {}), escala=url_escala, deducciones=url_deducciones)
 

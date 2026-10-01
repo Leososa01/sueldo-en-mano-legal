@@ -1,0 +1,54 @@
+name: Tope SIPA del mes (automático)
+
+# El tope de aportes lo mueve ANSES todos los meses por la movilidad del DNU
+# 274/2024 (IPC de dos meses atrás). El cálculo es determinístico y reproduce
+# al centavo las resoluciones oficiales (ver scripts/tope_sipa.py), así que
+# acá SÍ se publica solo: commit directo a main, sin PR. Las tablas de ARCA
+# (escala y deducciones de Ganancias) siguen en el otro workflow, que abre PR,
+# porque salen de leer PDFs.
+#
+# Corre todos los días a las 09:00 de Argentina. Los días que el tope del mes
+# ya está publicado no hace nada. El 1 de cada mes aparece el tope nuevo.
+
+on:
+  schedule:
+    - cron: "0 12 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+
+concurrency:
+  group: tope-sipa
+  cancel-in-progress: false
+
+jobs:
+  tope:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependencias
+        run: pip install requests
+
+      - name: Calcular el tope del mes con el IPC del INDEC
+        run: python scripts/tope_sipa.py
+
+      - name: Publicar si cambió
+        run: |
+          if git diff --quiet -- parametros.json; then
+            echo "Sin cambios."
+            exit 0
+          fi
+          git config user.name "robot-tope-sipa"
+          git config user.email "robot@sueldo-en-mano"
+          VERSION=$(python -c "import json; print(json.load(open('parametros.json'))['version'])")
+          MES=$(python -c "import json; print(json.load(open('parametros.json'))['aportes']['vigenciaDesde'][:7])")
+          TOPE=$(python -c "import json; print(json.load(open('parametros.json'))['aportes']['baseImponibleTope'])")
+          git add parametros.json
+          git commit -m "Pizarra v${VERSION}: tope SIPA de ${MES} = ${TOPE} (robot, IPC INDEC)"
+          git push

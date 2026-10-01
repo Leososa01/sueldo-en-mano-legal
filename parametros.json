@@ -1,11 +1,11 @@
 {
-  "version": 4,
+  "version": 5,
   "vigenciaDesde": "2026-07-01",
-  "actualizado": "2026-08-22",
+  "actualizado": "2026-10-01",
   "fuentes": {
     "escala": "https://www.afip.gob.ar/gananciasYBienes/ganancias/personas-humanas-sucesiones-indivisas/declaracion-jurada/documentos/Tabla-Art-94-LIG-per-jul-a-dic-2026.pdf",
     "deducciones": "https://www.afip.gob.ar/gananciasYBienes/ganancias/personas-humanas-sucesiones-indivisas/deducciones/documentos/Deducciones-personales-art-30-jul-dic-2026.pdf",
-    "topeSipa": "Res. ANSES 232/2026 (agosto 2026, movilidad 1,89%)",
+    "topeSipa": "Movilidad DNU 274/2024 = IPC INDEC de M-2 (datos.gob.ar, serie 148.3_INIVELNAL_DICI_M_26). Calculado por el robot: 2026-09: 2.11%, 2026-10: 1.66%. Reproduce al centavo las Res. ANSES 2026.",
     "topeSeguroVida": "Art. 85 inc. b LIG - tope anual del periodo fiscal 2026 (se actualiza por IPC cada anio fiscal)"
   },
   "ganancias": {
@@ -66,7 +66,13 @@
     ]
   },
   "aportes": {
-    "baseImponibleTope": 4594798.23,
-    "vigenciaDesde": "2026-08-01"
+    "baseImponibleTope": 4769631.49,
+    "vigenciaDesde": "2026-10-01",
+    "historico": {
+      "2026-07": 4509567.41,
+      "2026-08": 4594798.23,
+      "2026-09": 4691748.47,
+      "2026-10": 4769631.49
+    }
   }
 }
