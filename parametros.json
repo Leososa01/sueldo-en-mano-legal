@@ -1,5 +1,5 @@
 {
-  "version": 6,
+  "version": 7,
   "vigenciaDesde": "2026-07-01",
   "actualizado": "2026-10-01",
   "fuentes": {
@@ -7,7 +7,7 @@
     "deducciones": "https://www.afip.gob.ar/gananciasYBienes/ganancias/personas-humanas-sucesiones-indivisas/deducciones/documentos/Deducciones-personales-art-30-jul-dic-2026.pdf",
     "topeSipa": "Movilidad DNU 274/2024 = IPC INDEC de M-2 (datos.gob.ar, serie 148.3_INIVELNAL_DICI_M_26). Calculado por el robot: 2026-09: 2.11%, 2026-10: 1.66%. Reproduce al centavo las Res. ANSES 2026.",
     "topeSeguroVida": "Art. 85 inc. b LIG - tope anual del periodo fiscal 2026 (se actualiza por IPC cada anio fiscal)",
-    "diasNoLaborables": "Art. 7 Ley 27.399: hasta 3 dias no laborables con fines turisticos por anio, por decreto, publicados al menos 50 dias antes de fin del anio anterior. NO son feriados (art. 167 LCT: si se trabaja se paga como dia comun). Cargar a mano cuando salga el decreto: [{\"fecha\":\"AAAA-MM-DD\",\"nombre\":\"Puente turistico\"}]. Al 01/10/2026 los de 2027 todavia no salieron."
+    "diasNoLaborables": "Art. 7 Ley 27.399: hasta 3 dias no laborables con fines turisticos por anio. NO son feriados (art. 167 LCT: si se trabaja se paga como dia comun). 2026: Resolucion 164/2025 de Jefatura de Gabinete (B.O. 26/12/2025): 23/03, 10/07 y 07/12; se carga solo el que queda por delante (07/12). Los de 2027 todavia no salieron al 01/10/2026."
   },
   "ganancias": {
     "gniAnual": 5585736.93,
@@ -76,5 +76,10 @@
       "2026-10": 4769631.49
     }
   },
-  "diasNoLaborables": []
+  "diasNoLaborables": [
+    {
+      "fecha": "2026-12-07",
+      "nombre": "Puente turístico"
+    }
+  ]
 }
