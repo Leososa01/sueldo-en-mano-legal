@@ -39,15 +39,20 @@
   </div>
 
   <p>
-    Al pedir la baja o el reintegro te damos un <strong>código de gestión</strong>: lo ves en la app
-    (al entrar, en «Baja y arrepentimiento») y viaja en el correo que abren estos enlaces.
+    Al pedir la baja o el reintegro te damos un <strong>código de gestión</strong>, que identifica tu
+    pedido: en la app lo ves en «Baja y arrepentimiento»; desde esta página aparece en cada sección y
+    ya viaja en el correo que abren sus enlaces.
   </p>
+  <noscript><p>Tu navegador no ejecuta el código de esta página, así que no vas a ver el código de
+    gestión acá: escribinos igual y te lo mandamos en la respuesta, dentro de las 24 horas.</p></noscript>
 
   <h2>Botón de baja</h2>
+  <p class="codigo">Tu código de gestión: <strong id="codigo-baja">se arma al abrir la página</strong></p>
   <p>
-    En Android cancelamos la suscripción de nuestro lado <strong>dentro de las 24 horas</strong> de tu
-    pedido, y además te dejamos entrar directo a la pantalla de la tienda para que lo veas confirmado.
-    En iPhone, Apple no nos permite cancelar por vos: la baja se confirma con un toque en su pantalla.
+    En Android podés cancelar la suscripción vos, al instante, en la pantalla de Google Play de abajo;
+    si además nos escribís con el enlace de esta sección, la cancelamos de nuestro lado
+    <strong>dentro de las 24 horas</strong>. En iPhone, Apple no nos permite cancelar por vos: la baja
+    se confirma con un toque en su pantalla.
   </p>
   <ul>
     <li><a href="https://play.google.com/store/account/subscriptions">Cancelar en Google Play</a></li>
@@ -56,12 +61,14 @@
   <p>
     Seguís usando lo que pagaste hasta que termine el período en curso, y no se te vuelve a cobrar.
     Si querés dejar constancia con nosotros, escribinos a
-    <a href="mailto:sueldoenmano.app@gmail.com?subject=Baja%20de%20mi%20suscripci%C3%B3n%20a%20Sueldo%20en%20Mano">sueldoenmano.app@gmail.com</a>:
+    <a id="correo-baja" href="mailto:sueldoenmano.app@gmail.com?subject=Baja%20de%20mi%20suscripci%C3%B3n%20a%20Sueldo%20en%20Mano">sueldoenmano.app@gmail.com</a>:
     la fecha de tu correo vale como fecha del pedido.
   </p>
-  <p>También podés hacerlo desde la app: el acceso <strong>«Baja y arrepentimiento»</strong> está en la pantalla de inicio.</p>
+  <p>También podés hacerlo desde la app: el acceso <strong>«Baja y arrepentimiento»</strong> está al pie
+    de Inicio y en Ajustes › La app › Privacidad.</p>
 
   <h2>Botón de arrepentimiento</h2>
+  <p class="codigo">Tu código de gestión: <strong id="codigo-arre">se arma al abrir la página</strong></p>
   <p>
     Dentro de los <strong>10 días corridos</strong> de la compra podés arrepentirte y pedir que se
     deje sin efecto, sin explicar por qué (art. 34 de la Ley 24.240). Te devolvemos lo pagado: lo
@@ -69,10 +76,10 @@
     nosotros</strong> por otro medio, dentro de los 10 días de tu pedido.
   </p>
   <p>
-    <a href="mailto:sueldoenmano.app@gmail.com?subject=Arrepentimiento%20de%20compra%20%E2%80%94%20Sueldo%20en%20Mano&amp;body=Ejerzo%20el%20derecho%20de%20arrepentimiento%20del%20art.%2034%20de%20la%20Ley%2024.240.%0A%0AFecha%20de%20la%20compra%3A%20%0AMi%20identificador%20en%20la%20app%20(Configuraci%C3%B3n%20%E2%80%BA%20Privacidad)%3A%20">
+    <a id="correo-arre" href="mailto:sueldoenmano.app@gmail.com?subject=Arrepentimiento%20de%20compra%20%E2%80%94%20Sueldo%20en%20Mano&amp;body=Ejerzo%20el%20derecho%20de%20arrepentimiento%20del%20art.%2034%20de%20la%20Ley%2024.240.%0A%0AFecha%20de%20la%20compra%3A%20%0AMi%20identificador%20en%20la%20app%20(Ajustes%20%E2%80%BA%20La%20app%20%E2%80%BA%20Privacidad)%3A%20">
       <strong>Arrepentirme de una compra</strong></a> — te contestamos y gestionamos el reintegro con la tienda.
   </p>
-  <p>Los mismos botones están en la app, a la vista <strong>apenas entrás</strong>.</p>
+  <p>Los mismos botones están en la app: al pie de Inicio y en Ajustes › La app › Privacidad.</p>
 
   <h2>Tus datos</h2>
   <p>
@@ -84,5 +91,45 @@
   <footer>
     Sueldo en Mano — Baja y arrepentimiento · Vigente desde el 16 de octubre de 2026.
   </footer>
+  <script>
+    /*
+     * EL CÓDIGO DE GESTIÓN, EN EL MOMENTO (Disp. 954/2025, art. 4). En la app sale
+     * del identificador de la persona; acá no hay ninguno, así que va la fecha y
+     * seis caracteres al azar. Viaja en el correo, para que el pedido tenga la
+     * misma constancia de los dos lados.
+     */
+    (function () {
+      var d = new Date();
+      var dos = function (n) { return (n < 10 ? '0' : '') + n; };
+      var hoy = '' + d.getFullYear() + dos(d.getMonth() + 1) + dos(d.getDate());
+      var fecha = dos(d.getDate()) + '/' + dos(d.getMonth() + 1) + '/' + d.getFullYear();
+      var azar = (Math.random().toString(36) + '000000').slice(2, 8).toUpperCase();
+      var correo = 'mailto:sueldoenmano.app@gmail.com';
+      var armar = function (asunto, cuerpo) {
+        return correo + '?subject=' + encodeURIComponent(asunto) + '&body=' + encodeURIComponent(cuerpo);
+      };
+      var baja = 'SEM-BAJA-' + hoy + '-' + azar;
+      var arre = 'SEM-ARRE-' + hoy + '-' + azar;
+      var ruta = 'Ajustes › La app › Privacidad';
+      document.getElementById('codigo-baja').textContent = baja;
+      document.getElementById('codigo-arre').textContent = arre;
+      document.getElementById('correo-baja').href = armar(
+        'Baja de mi suscripción a Sueldo en Mano',
+        'Quiero dar de baja mi suscripción a Sueldo en Mano.\n\n' +
+          'Código de gestión: ' + baja + '\n' +
+          'Fecha del pedido: ' + fecha + '\n' +
+          'Mi identificador en la app (' + ruta + '), si lo tengo a mano: \n'
+      );
+      document.getElementById('correo-arre').href = armar(
+        'Arrepentimiento de compra — Sueldo en Mano',
+        'Ejerzo el derecho de arrepentimiento del art. 34 de la Ley 24.240 sobre mi compra en Sueldo en Mano.\n\n' +
+          'Código de gestión: ' + arre + '\n' +
+          'Fecha del pedido: ' + fecha + '\n' +
+          'Fecha de la compra (completala): \n' +
+          'Mi identificador en la app (' + ruta + '), si lo tengo a mano: \n\n' +
+          'Pido que se deje sin efecto la compra y se me reintegre lo pagado.'
+      );
+    })();
+  </script>
 </body>
 </html>
