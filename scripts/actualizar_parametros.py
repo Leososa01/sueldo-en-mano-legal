@@ -2,17 +2,38 @@
 """
 Robot de parámetros fiscales de Sueldo en Mano.
 
-Corre una vez por mes (GitHub Action). Baja los PDFs oficiales de ARCA
+Corre todos los lunes (GitHub Action). Baja los PDFs oficiales de ARCA
 (escala del art. 94 y deducciones del art. 30), extrae los valores, los
 VALIDA matemáticamente y, si cambiaron respecto de parametros.json, escribe
-el archivo nuevo. El workflow abre un Pull Request para revisión humana:
-nunca se publica un número impositivo sin que alguien lo mire.
+el archivo nuevo.
+
+Quién lo publica (26/10/2026, pedido del dueño: «todo lo que se pueda
+actualizar automáticamente hazlo»):
+  - SOLO, con commit directo, cuando el cambio es una actualización por IPC
+    limpia: TODOS los montos leídos (mínimo no imponible, deducción especial,
+    cónyuge, hijos y cada tramo de la escala) se mueven por el MISMO factor,
+    entre +0 % y +60 %. La ley 27.743 (art. 71) los actualiza a todos por el
+    mismo IPC, así que un PDF mal leído no puede dar un factor parejo.
+  - Con un Pull Request para revisión humana en cualquier otro caso (factores
+    desparejos, un salto raro, o un tope SIPA cargado a mano).
+El script lo avisa por GITHUB_OUTPUT (directo=true/false).
 
 Si algo no se puede leer o no cierra, el script termina con error y NO toca
 nada (la app sigue con los últimos valores buenos).
+
+BUG ARREGLADO (26/10/2026): en el primer semestre el robot multiplicaba por 2
+lo que leía, creyendo que el PDF de enero a junio traía los acumulados a
+JUNIO. El de 2026 trae los de DICIEMBRE («IMPORTE DE LA DEDUCCIÓN A DICIEMBRE
+2026»: el año entero con los valores del semestre), así que en enero de 2027
+habría propuesto las deducciones y la escala al DOBLE y la app habría
+calculado Ganancias muy por debajo de lo real. Ahora se proyecta solo si el
+PDF dice explícitamente «a junio», y un control nuevo compara el mínimo no
+imponible con el primer tramo de la escala (los dos tienen que hablar del
+mismo horizonte).
 """
 import io
 import json
+import os
 import re
 import sys
 from datetime import date
@@ -39,19 +60,34 @@ def num(texto):
 
 
 def urls_semestre(hoy):
-    """URLs de los PDF del semestre vigente (con proyección en el 1er semestre)."""
+    """URLs de los PDF del semestre vigente."""
     anio = hoy.year
     if hoy.month >= 7:
         return (
             f"{BASE}/declaracion-jurada/documentos/Tabla-Art-94-LIG-per-jul-a-dic-{anio}.pdf",
             f"{BASE}/deducciones/documentos/Deducciones-personales-art-30-jul-dic-{anio}.pdf",
-            False,  # la tabla ya es anual
         )
     return (
         f"{BASE}/declaracion-jurada/documentos/Tabla-Art-94-LIG-per-ene-a-jun-{anio}.pdf",
         f"{BASE}/deducciones/documentos/Deducciones-personales-art-30-ene-a-jun-{anio}.pdf",
-        True,  # solo hay medio año publicado: se proyecta ×2 hasta que salga julio
     )
+
+
+def hay_que_proyectar(pdf_deducciones):
+    """
+    ¿El PDF trae los importes acumulados solo hasta JUNIO (y hay que llevarlos
+    al año multiplicando por 2)? Lo dice su primera página: «IMPORTE DE LA
+    DEDUCCIÓN A DICIEMBRE» (anual, como el de 2026) o «A JUNIO». Si no dice
+    ninguna de las dos, error: mejor no publicar que adivinar.
+    """
+    with pdfplumber.open(pdf_deducciones) as pdf:
+        texto = re.sub(r"\s+", " ", (pdf.pages[0].extract_text() or "").upper())
+    pdf_deducciones.seek(0)
+    if "DEDUCCIÓN A DICIEMBRE" in texto or "DEDUCCION A DICIEMBRE" in texto:
+        return False
+    if "DEDUCCIÓN A JUNIO" in texto or "DEDUCCION A JUNIO" in texto:
+        return True
+    raise RuntimeError("El PDF de deducciones no dice si los importes son a diciembre o a junio")
 
 
 def extraer_escala(pdf_bytes, proyectar):
@@ -144,9 +180,49 @@ def extraer_deducciones(pdf_bytes, proyectar):
     }
 
 
+def controlar_horizonte(escala, deducciones):
+    """
+    El mínimo no imponible y el primer tramo de la escala son del mismo año y
+    se actualizan por el mismo IPC: su cociente es estable (2,576 en las dos
+    tablas de 2026). Si uno se proyectó y el otro no, el cociente se va al
+    doble o a la mitad.
+    """
+    cociente = deducciones["gniAnual"] / escala[1]["desde"]
+    if not (2.3 <= cociente <= 2.9):
+        raise RuntimeError(f"Mínimo no imponible / primer tramo = {cociente:.3f} (esperaba ~2,58)")
+
+
+def factor_parejo(actual, nuevo):
+    """
+    El factor común si TODOS los montos leídos se movieron por el mismo factor
+    (con 0,05 % de tolerancia por redondeo) y ese factor está entre 1 y 1,6;
+    si no, None. Es la marca de una actualización por IPC limpia.
+    """
+    claves = ["gniAnual", "deduccionEspecialAnual", "conyugeAnual", "hijoAnual", "hijoIncapacitadoAnual"]
+    try:
+        cocientes = [nuevo[k] / actual[k] for k in claves]
+        ea, en = actual["escalaAnual"], nuevo["escalaAnual"]
+        cocientes += [en[i]["desde"] / ea[i]["desde"] for i in range(1, 9)]
+        cocientes += [en[i]["fijo"] / ea[i]["fijo"] for i in range(1, 9)]
+    except (KeyError, IndexError, TypeError, ZeroDivisionError):
+        return None
+    menor, mayor = min(cocientes), max(cocientes)
+    if mayor / menor - 1 > 0.0005 or not (1.0 < menor and mayor <= 1.6):
+        return None
+    return (menor + mayor) / 2
+
+
+def avisar_salida(directo):
+    """Le dice al workflow si publica solo o abre un PR."""
+    salida = os.environ.get("GITHUB_OUTPUT")
+    if salida:
+        with open(salida, "a", encoding="utf-8") as f:
+            f.write(f"directo={'true' if directo else 'false'}\n")
+
+
 def main():
     hoy = date.today()
-    url_escala, url_deducciones, proyectar = urls_semestre(hoy)
+    url_escala, url_deducciones = urls_semestre(hoy)
     # Tope SIPA opcional por línea de comandos (workflow_dispatch manual).
     # 1er argumento: el tope. 2do (opcional): desde qué mes rige, "AAAA-MM".
     # Por defecto el mes de hoy — pasalo a mano si cargás el tope tarde (el de
@@ -159,8 +235,11 @@ def main():
     with open("parametros.json", encoding="utf-8") as f:
         actual = json.load(f)
 
+    pdf_deducciones = bajar(url_deducciones)
+    proyectar = hay_que_proyectar(pdf_deducciones)
     escala = extraer_escala(bajar(url_escala), proyectar)
-    deducciones = extraer_deducciones(bajar(url_deducciones), proyectar)
+    deducciones = extraer_deducciones(pdf_deducciones, proyectar)
+    controlar_horizonte(escala, deducciones)
 
     nuevo = dict(actual)
     # OJO: se PARTE de las ganancias actuales y recién encima se pisan las que el
@@ -197,9 +276,16 @@ def main():
     nuevo["actualizado"] = hoy.isoformat()
     nuevo["vigenciaDesde"] = f"{hoy.year}-07-01" if hoy.month >= 7 else f"{hoy.year}-01-01"
 
+    factor = None if tope_manual else factor_parejo(actual.get("ganancias", {}), nuevo["ganancias"])
+    avisar_salida(factor is not None)
+
     with open("parametros.json", "w", encoding="utf-8") as f:
         json.dump(nuevo, f, ensure_ascii=False, indent=2)
         f.write("\n")
+    if factor is not None:
+        print(f"Actualización por IPC pareja (+{(factor - 1) * 100:.2f} %): se publica sola.")
+    else:
+        print("El cambio no es una actualización pareja: va a un PR para revisión humana.")
     print(f"parametros.json actualizado a la versión {nuevo['version']}")
 
 

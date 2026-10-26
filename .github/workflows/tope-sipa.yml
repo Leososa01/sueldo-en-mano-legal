@@ -4,8 +4,10 @@ name: Tope SIPA del mes (automático)
 # 274/2024 (IPC de dos meses atrás). El cálculo es determinístico y reproduce
 # al centavo las resoluciones oficiales (ver scripts/tope_sipa.py), así que
 # acá SÍ se publica solo: commit directo a main, sin PR. Las tablas de ARCA
-# (escala y deducciones de Ganancias) siguen en el otro workflow, que abre PR,
-# porque salen de leer PDFs.
+# (escala y deducciones de Ganancias) van en el otro workflow, porque salen de
+# leer PDFs: se publican solas solo cuando todo sube parejo.
+# Desde el 26/10/2026 también lleva el tope anual del seguro de vida de
+# Ganancias (IPC de octubre a octubre, el 1 de enero de cada año).
 #
 # Corre todos los días a las 09:00 de Argentina. Los días que el tope del mes
 # ya está publicado no hace nada. El 1 de cada mes aparece el tope nuevo.

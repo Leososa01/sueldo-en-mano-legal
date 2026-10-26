@@ -28,6 +28,15 @@ Guardarraíles (cualquiera que falle = error, sin cambios):
   - no se publica un tope de un mes FUTURO: el de octubre sale el 1 de
     octubre, aunque el IPC de agosto esté desde mediados de septiembre;
   - el IPC usado tiene que ser exactamente el del mes M-2.
+
+EL TOPE DEL SEGURO DE VIDA (26/10/2026). Ya que este robot baja el IPC,
+también lleva el tope anual de las primas de seguro de vida de Ganancias
+(art. 85 inc. b): se actualiza una vez por año por la variación del IPC de
+octubre contra octubre del año anterior. Verificado al centavo: 573.817,13
+(2025) × IPC oct-2025 / oct-2024 = 753.472,14 (2026). Se publica el 1 de
+enero de cada año, nunca antes (antes de esa fecha el año que rige es el
+anterior), en ganancias.topeSeguroVidaAnual, con su año en
+ganancias.topeSeguroVidaAnio.
 """
 import json
 import sys
@@ -109,6 +118,31 @@ def calcular(actual, ipc, hoy):
     return dict(sorted(historico.items())), movs
 
 
+# El valor que se cargó a mano en la pizarra v3 es el del período fiscal 2026.
+ANIO_SEGURO_VIDA_CARGADO = 2026
+
+
+def seguro_de_vida(ganancias, ipc, hoy):
+    """
+    (año, tope) del seguro de vida del año de hoy, llevado por IPC de octubre
+    a octubre desde el último publicado; None si ya está al día.
+    """
+    anio = int(ganancias.get("topeSeguroVidaAnio") or ANIO_SEGURO_VIDA_CARGADO)
+    tope = ganancias.get("topeSeguroVidaAnual")
+    if tope is None or anio >= hoy.year:
+        return None
+    while anio < hoy.year:
+        anio += 1
+        oct_antes, oct_antes2 = f"{anio - 1}-10", f"{anio - 2}-10"
+        if oct_antes not in ipc or oct_antes2 not in ipc:
+            raise RuntimeError(f"Falta el IPC de {oct_antes2} o {oct_antes} para el seguro de vida de {anio}")
+        factor = ipc[oct_antes] / ipc[oct_antes2]
+        if not (1.0 <= factor <= 4.0):
+            raise RuntimeError(f"Factor del seguro de vida de {anio} fuera de rango: {factor:.4f}")
+        tope = r2(tope * factor)
+    return anio, tope
+
+
 def main():
     hoy = date.today()
     with open("parametros.json", encoding="utf-8") as f:
@@ -124,6 +158,15 @@ def main():
         "vigenciaDesde": f"{ultimo}-01",
         "historico": historico,
     }
+    seguro = seguro_de_vida(actual.get("ganancias") or {}, ipc, hoy)
+    if seguro:
+        anio_seguro, tope_seguro = seguro
+        nuevo["ganancias"]["topeSeguroVidaAnual"] = tope_seguro
+        nuevo["ganancias"]["topeSeguroVidaAnio"] = anio_seguro
+        nuevo.setdefault("fuentes", {})["topeSeguroVida"] = (
+            f"Art. 85 inc. b LIG - tope anual del período fiscal {anio_seguro}, actualizado por el robot "
+            f"con el IPC INDEC de octubre a octubre (datos.gob.ar, serie {SERIE_IPC})."
+        )
     if movs:
         detalle = ", ".join(f"{m}: {p:.2f}%" for m, p in movs.items())
         nuevo.setdefault("fuentes", {})["topeSipa"] = (
@@ -131,7 +174,7 @@ def main():
             f"Calculado por el robot: {detalle}. Reproduce al centavo las Res. ANSES 2026."
         )
 
-    if nuevo["aportes"] == actual.get("aportes"):
+    if nuevo["aportes"] == actual.get("aportes") and not seguro:
         print(f"Sin cambios: el tope de {ultimo} ya está publicado.")
         return
 
@@ -142,6 +185,8 @@ def main():
         f.write("\n")
     for m, p in movs.items():
         print(f"{m}: movilidad {p:.2f}% -> tope {historico[m]:,.2f}")
+    if seguro:
+        print(f"Seguro de vida {seguro[0]}: tope anual {seguro[1]:,.2f}")
     print(f"parametros.json -> version {nuevo['version']}, tope vigente {ultimo}: {historico[ultimo]:,.2f}")
 
 

@@ -2,9 +2,12 @@ name: Actualizar parámetros fiscales
 
 on:
   schedule:
-    # Todos los lunes, 12:00 UTC (09:00 Argentina). Solo abre PR si hay
-    # valores nuevos: las semanas sin novedades no hacen nada.
-    - cron: "0 12 * * 1"
+    # Todos los lunes, 13:00 UTC (10:00 Argentina, una hora después del tope
+    # del SIPA). Las semanas sin novedades no hace nada. Cuando ARCA publica
+    # tablas nuevas y TODOS los montos suben por el mismo factor (una
+    # actualización por IPC limpia), las publica solo; si no, abre un PR para
+    # revisión humana (ver scripts/actualizar_parametros.py).
+    - cron: "0 13 * * 1"
   workflow_dispatch:
     inputs:
       tope_sipa:
@@ -34,12 +37,25 @@ jobs:
         run: pip install pdfplumber requests
 
       - name: Bajar PDFs de ARCA y regenerar parametros.json
+        id: robot
         run: >-
           python scripts/actualizar_parametros.py
           "${{ github.event.inputs.tope_sipa }}"
           "${{ github.event.inputs.mes_tope }}"
 
-      - name: Abrir Pull Request si hay cambios
+      - name: Publicar solo si es una actualización por IPC pareja
+        if: steps.robot.outputs.directo == 'true'
+        run: |
+          git config user.name "robot-ganancias"
+          git config user.email "robot@sueldo-en-mano"
+          VERSION=$(python -c "import json; print(json.load(open('parametros.json'))['version'])")
+          git add parametros.json
+          git commit -m "Pizarra v${VERSION}: tablas de Ganancias de ARCA, actualización por IPC pareja (robot)"
+          git pull --rebase
+          git push
+
+      - name: Abrir Pull Request si hay cambios que revisar
+        if: steps.robot.outputs.directo != 'true'
         uses: peter-evans/create-pull-request@v6
         with:
           commit-message: "Parámetros fiscales nuevos (ARCA/ANSES)"
@@ -47,7 +63,9 @@ jobs:
           body: |
             El robot encontró valores nuevos en los PDFs oficiales de ARCA
             (y/o un tope SIPA cargado a mano). Ya pasaron la validación
-            matemática (alícuotas, montos fijos que cierran, relación 4,8×).
+            matemática (alícuotas, montos fijos que cierran, relación 4,8×,
+            mínimo no imponible contra el primer tramo), pero NO subieron
+            todos por el mismo factor: por eso no se publicaron solos.
 
             **Revisá el diff contra los PDF oficiales y aprobá con Merge.**
             Al mergear, la pizarra se publica sola y las apps toman los

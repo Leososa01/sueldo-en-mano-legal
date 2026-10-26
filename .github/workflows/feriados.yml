@@ -1,0 +1,78 @@
+name: Feriados del año (automático)
+
+# El calendario de feriados lo fija un decreto cada año, y a veces agrega días
+# que ninguna regla calcula (el 09/11/2026, por la visita del Papa). El robot
+# lee el calendario oficial de Jefatura de Gabinete y lo controla contra
+# ArgentinaDatos (ver scripts/feriados.py). Cuando las dos fuentes coinciden
+# publica solo, como el tope del SIPA: commit directo a main, sin PR.
+# Cuando no coinciden, ese año no se toca y se abre un issue para que lo mire
+# una persona.
+#
+# Corre todos los días a las 09:30 de Argentina (media hora después del tope
+# del SIPA, para no pisarse al hacer push). Los días sin novedades no hace nada.
+
+on:
+  schedule:
+    - cron: "30 12 * * *"
+  workflow_dispatch:
+
+permissions:
+  contents: write
+  issues: write
+
+concurrency:
+  group: pizarra-feriados
+  cancel-in-progress: false
+
+jobs:
+  feriados:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Instalar dependencias
+        run: pip install requests
+
+      - name: Leer el calendario oficial y controlarlo
+        run: python scripts/feriados.py
+
+      - name: Publicar si cambió
+        run: |
+          if git diff --quiet -- parametros.json; then
+            echo "Sin cambios."
+            exit 0
+          fi
+          git config user.name "robot-feriados"
+          git config user.email "robot@sueldo-en-mano"
+          VERSION=$(python -c "import json; print(json.load(open('parametros.json'))['version'])")
+          git add parametros.json
+          git commit -m "Pizarra v${VERSION}: feriados del calendario oficial (robot)"
+          # El robot del tope del SIPA puede haber publicado en el medio.
+          git pull --rebase
+          git push
+
+      - name: Avisar si las fuentes no coinciden
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ ! -f desacuerdos-feriados.txt ]; then
+            exit 0
+          fi
+          TITULO="Feriados: el calendario oficial y ArgentinaDatos no coinciden"
+          if [ -n "$(gh issue list --state open --search "in:title \"$TITULO\"" --json number --jq '.[].number')" ]; then
+            echo "Ya hay un issue abierto."
+            exit 0
+          fi
+          {
+            echo "El robot de feriados no publicó estos años porque las dos fuentes dicen cosas distintas:"
+            echo
+            sed 's/^/- /' desacuerdos-feriados.txt
+            echo
+            echo "Mirá el calendario oficial (argentina.gob.ar/jefatura/feriados-nacionales-AAAA) y el decreto."
+            echo "Mientras tanto, la app sigue con lo que había publicado (o con su cálculo por la ley)."
+          } > cuerpo.md
+          gh issue create --title "$TITULO" --body-file cuerpo.md
