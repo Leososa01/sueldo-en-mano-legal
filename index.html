@@ -27,13 +27,13 @@
 </head>
 <body>
 <h1>Política de privacidad</h1>
-<p class="sub">Aplicación <strong>Sueldo en Mano</strong> — versión 3, vigente desde el 16 de octubre de 2026</p>
+<p class="sub">Aplicación <strong>Sueldo en Mano</strong> — versión 4, vigente desde el 27 de octubre de 2026</p>
 <div class="box">
 <p>Los datos de tu cuenta (sueldo, horas, recibos, gastos) se guardan cifrados en tu teléfono, con las pocas excepciones del punto 2. No tenemos una nube con tus cuentas ni con tus cálculos.</p>
-<p>Salen del teléfono en dos casos que vos elegís —escanear un recibo y preguntarle al asistente— y solo después de que aceptes un aviso específico. En esos casos viajan a nuestro servidor y a Anthropic, en Estados Unidos.</p>
+<p>Salen del teléfono en tres casos que vos elegís —escanear un recibo, preguntarle al asistente y leer tu convenio— y solo después de que aceptes un aviso específico. En esos casos viajan a nuestro servidor y a Anthropic, en Estados Unidos.</p>
 <p>Además, la app se comunica con servicios que no reciben tus datos de trabajo: publicidad (Google AdMob), compras (RevenueCat, Google Play y App Store), actualizaciones (Expo) y la descarga de los parámetros fiscales (GitHub). Abajo está qué recibe cada uno.</p>
 </div>
-<p>Esta política explica, según la Ley 25.326 de Protección de los Datos Personales y sus normas complementarias, qué datos usa la app, para qué, dónde y qué derechos tenés. Forma parte de los términos y condiciones de la app. Lo que necesita tu consentimiento —el escaneo, el asistente y la publicidad— te lo pedimos aparte, con una casilla que tildás vos: usar la app no equivale a darlo.</p>
+<p>Esta política explica, según la Ley 25.326 de Protección de los Datos Personales y sus normas complementarias, qué datos usa la app, para qué, dónde y qué derechos tenés. Forma parte de los términos y condiciones de la app. Lo que necesita tu consentimiento —el escaneo, el asistente, la lectura del convenio y la publicidad— te lo pedimos aparte, con una casilla que tildás vos: usar la app no equivale a darlo.</p>
 
 <h2>1. ¿Quién es el responsable?</h2>
 <p>Responsable del tratamiento: Leonardo Joaquín Sosa Escobar, persona humana, desarrollador de la app, CUIT 20-38942828-1, con domicilio en Almirante Brown 3666, Garín, Partido de Escobar, Provincia de Buenos Aires. Correo: sueldoenmano.app@gmail.com. No hay un encargado de datos aparte: los pedidos y las consultas los atiende él.</p>
@@ -48,8 +48,8 @@
 <p>Esta es la lista completa de los servicios con los que se comunica la app. Nuestro servidor está en Alemania; los demás, en Estados Unidos o en la infraestructura global de esas empresas.</p>
 <div class="tabla"><table>
 <tr><th>Servicio</th><th>Qué recibe</th><th>Cuándo</th><th>Para qué</th><th>Cuánto lo conserva</th></tr>
-<tr><th>Nuestro servidor (alojado en Render, en Frankfurt, Alemania)</th><td>Escaneo: la foto o el archivo del recibo, datos de tu configuración (fecha de ingreso, básico, % de antigüedad y presentismo, nombres de tus adicionales y divisor) y un resumen de tus recibos anteriores, sin los conceptos que la app reconoce como sindicales. Asistente: tus preguntas, los últimos mensajes de la charla (hasta 12, con las respuestas que calculó la app en tu teléfono) y datos de tu configuración (básico, convenio, turno, valor de tu hora y cómo se arma, recargo nocturno, si cobrás antigüedad y presentismo). En los dos: un identificador aleatorio, tu dirección IP y la versión y fecha del aviso que aceptaste.</td><td>Cuando escaneás un recibo o le preguntás al asistente, después de aceptar el aviso. Además, al abrir el escaneo o el asistente la app puede despertar el servidor con un pedido que no lleva datos tuyos: le llega tu IP, como a cualquier sitio.</td><td>Reenviar el pedido a la IA, controlar el límite de usos y registrar la prueba de tu consentimiento.</td><td>El recibo y las preguntas no se guardan: se procesan y se descartan. Se guardan: el contador de usos del mes (con la IP seudonimizada, es decir convertida en un código), que se descarta al mes siguiente; y, por cada uso, la constancia de tu consentimiento (tu identificador, qué función usaste, la fecha y hora, y la versión, fecha y huella del aviso que aceptaste), que conservamos 5 años. Render guarda además sus propios registros técnicos (IP, fecha, dirección pedida) por el plazo que fija su plan.</td></tr>
-<tr><th>Anthropic (modelo de IA Claude)</th><td>Lo mismo que recibe nuestro servidor para ese pedido, sin tu IP ni tu identificador.</td><td>Solo cuando escaneás un recibo o le preguntás al asistente.</td><td>Leer el recibo o contestar la pregunta.</td><td>Anthropic no usa estos datos para entrenar sus modelos. Los conserva hasta 30 días; si sus sistemas de seguridad marcan un contenido, puede conservarlo hasta 2 años.</td></tr>
+<tr><th>Nuestro servidor (alojado en Render, en Frankfurt, Alemania)</th><td>Escaneo: la foto o el archivo del recibo, datos de tu configuración (fecha de ingreso, básico, % de antigüedad y presentismo, nombres de tus adicionales y divisor) y un resumen de tus recibos anteriores, sin los conceptos que la app reconoce como sindicales. Asistente: tus preguntas, los últimos mensajes de la charla (hasta 12, con las respuestas que calculó la app en tu teléfono) y datos de tu configuración (básico, convenio, turno, valor de tu hora y cómo se arma, recargo nocturno, si cobrás antigüedad y presentismo). Convenio: el archivo que elegís (el PDF o las fotos de sus páginas), sin ningún dato de tu configuración ni de tus recibos. En los tres: un identificador aleatorio, tu dirección IP y la versión y fecha del aviso que aceptaste.</td><td>Cuando escaneás un recibo, le preguntás al asistente o subís tu convenio, después de aceptar el aviso. Además, al abrir el escaneo o el asistente la app puede despertar el servidor con un pedido que no lleva datos tuyos: le llega tu IP, como a cualquier sitio.</td><td>Reenviar el pedido a la IA, controlar el límite de usos y registrar la prueba de tu consentimiento. Del convenio, además, no tener que leer dos veces el mismo.</td><td>El recibo, las preguntas y el archivo del convenio no se guardan: se procesan y se descartan. Se guardan: el contador de usos del mes (con la IP seudonimizada, es decir convertida en un código), que se descarta al mes siguiente; del convenio, el resultado de la lectura (las reglas que encontró, no el documento), identificado por una huella del archivo y sin quién lo subió, para no leer dos veces el mismo convenio; y, por cada uso, la constancia de tu consentimiento (tu identificador, qué función usaste, la fecha y hora, y la versión, fecha y huella del aviso que aceptaste), que conservamos 5 años. Render guarda además sus propios registros técnicos (IP, fecha, dirección pedida) por el plazo que fija su plan.</td></tr>
+<tr><th>Anthropic (modelo de IA Claude)</th><td>Lo mismo que recibe nuestro servidor para ese pedido, sin tu IP ni tu identificador.</td><td>Solo cuando escaneás un recibo, le preguntás al asistente o subís tu convenio.</td><td>Leer el recibo o el convenio, o contestar la pregunta.</td><td>Anthropic no usa estos datos para entrenar sus modelos. Los conserva hasta 30 días; si sus sistemas de seguridad marcan un contenido, puede conservarlo hasta 2 años.</td></tr>
 <tr><th>Google AdMob (publicidad)</th><td>Identificadores del dispositivo, IP y datos de interacción con los anuncios. Ningún dato de trabajo.</td><td>Mientras no hayas pagado Pro o Pro+ (también durante la prueba).</td><td>Mostrar anuncios NO personalizados, limitar cuántas veces ves el mismo y prevenir fraude. La app limita los anuncios a la clasificación PG: aptos para la mayoría del público, con orientación de los padres. Es lo que aceptás con la línea destacada de la pantalla de términos.</td><td>Según la política de privacidad de Google.</td></tr>
 <tr><th>RevenueCat (compras)</th><td>Un identificador aleatorio de compras, datos del dispositivo y, si comprás, qué compraste y el estado de tu suscripción.</td><td>Al abrir la app (para saber si tenés Pro o Pro+) y al comprar o restaurar compras.</td><td>Saber qué compraste y validar las compras.</td><td>Según la política de privacidad de RevenueCat.</td></tr>
 <tr><th>Google Play / App Store</th><td>La tienda procesa el cobro con los datos de tu cuenta en ella. Nosotros no recibimos tu medio de pago: solo sabemos, a través de RevenueCat, qué compraste y si está vigente.</td><td>Al comprar, y cuando la app consulta si hay una versión nueva.</td><td>Cobrar y ofrecerte la actualización.</td><td>Según sus propias políticas.</td></tr>
@@ -64,6 +64,7 @@
 <li>Calcular y estimar tu sueldo, tus horas extras, el aguinaldo, las vacaciones, Ganancias y una indemnización, con lo que cargás vos.</li>
 <li>Comparar tu recibo con lo que calculó la app. Es una comparación orientativa: no es una liquidación oficial ni reemplaza el recibo que emite tu empleador.</li>
 <li>Leer tu recibo con inteligencia artificial, solo si elegís escanearlo y después de aceptar el aviso. Podés cargar todo a mano.</li>
+<li>Leer tu convenio colectivo con inteligencia artificial, solo si lo subís y después de aceptar el aviso: te mostramos cada regla que encontró y elegís cuáles aplicar, y tu recibo manda sobre ellas. Podés cargar esos valores a mano.</li>
 <li>Contestar tus preguntas con el asistente. Sus respuestas son información general, no asesoramiento legal, contable ni impositivo.</li>
 <li>Registrar tus gastos y tus metas, si usás esas funciones. Quedan en tu teléfono.</li>
 <li>Con los datos técnicos: hacer funcionar la app, cuidar la seguridad del servidor, aplicar los topes de uso de la IA y validar las compras.</li>
@@ -73,7 +74,7 @@
 
 <h2>5. ¿Con qué base tratamos cada dato?</h2>
 <p>Lo que cargás queda en tu teléfono: no sale de ahí salvo lo que dice el punto 3.</p>
-<p>El escaneo y el asistente funcionan con tu consentimiento expreso, que te pedimos antes de la primera vez y podés revocar (arts. 5, 6 y 12 de la Ley 25.326).</p>
+<p>El escaneo, el asistente y la lectura del convenio funcionan con tu consentimiento expreso, que te pedimos antes de la primera vez y podés revocar (arts. 5, 6 y 12 de la Ley 25.326).</p>
 <p>La publicidad de Google AdMob también funciona con tu consentimiento: es la línea destacada que ves junto a la casilla de los términos. No es necesaria para que la app funcione; es lo que sostiene la versión gratuita. Si no querés anuncios, la opción es pagar Pro o Pro+.</p>
 <p>Los datos técnicos que reciben RevenueCat, las tiendas, Expo y GitHub Pages derivan de la relación contractual y son necesarios para cumplirla (art. 5 inc. 2 d) de la Ley 25.326).</p>
 
@@ -84,14 +85,14 @@
 
 <h2>7. ¿Dónde se procesan?</h2>
 <p>Nuestro servidor está en Alemania, dentro de la Unión Europea, que la normativa argentina considera con nivel adecuado de protección.</p>
-<p>Pero la lectura del recibo y las respuestas del asistente las hace Anthropic, en Estados Unidos, que NO está entre esos países. Por eso, antes de la primera vez que escaneás un recibo o usás el asistente, la app te pide tu consentimiento expreso para esa transferencia, con una casilla que tenés que tildar. Si no aceptás, cargás los datos a mano y el resto de la app funciona igual.</p>
+<p>Pero la lectura del recibo, la del convenio y las respuestas del asistente las hace Anthropic, en Estados Unidos, que NO está entre esos países. Por eso, antes de la primera vez que escaneás un recibo, subís tu convenio o usás el asistente, la app te pide tu consentimiento expreso para esa transferencia, con una casilla que tenés que tildar. Si no aceptás, cargás los datos a mano y el resto de la app funciona igual.</p>
 <p>Los demás servicios del punto 3 que están en Estados Unidos —AdMob, RevenueCat, las tiendas, Expo, GitHub y nuestra casilla de Gmail— reciben solo lo que figura ahí: identificadores, IP, los datos de una compra o lo que nos escribas. Nunca tus datos de trabajo.</p>
 
 <h2>8. Datos sensibles</h2>
 <p>Un recibo puede mostrar datos sensibles: la cuota sindical revela afiliación y algunos renglones muestran licencias por enfermedad. Nadie está obligado a darlos (art. 7 de la Ley 25.326). El porcentaje de cuota sindical que cargás se guarda solo en tu teléfono y no viaja ni con el asistente ni con el escaneo; en el resumen de tus recibos anteriores tampoco viajan los nombres de los conceptos que la app reconoce como sindicales. Pero si escaneás el recibo entero, esos renglones están en la imagen. Si no querés enviarlos, sacale una foto o elegila de la galería y dejalos fuera del recorte: se abre el recorte de tu teléfono, y antes de enviarla la app te la muestra para que la revises. Si elegís un archivo (PDF o imagen), se envía completo.</p>
 
 <h2>9. Permisos del teléfono</h2>
-<p>Cámara y fotos o archivos: solo para fotografiar o elegir tu recibo, o para elegir tu respaldo (.chx) cuando lo importás. Huella o rostro: para desbloquear la app; la huella queda en el teléfono, la app solo recibe un «sí» o «no». Notificaciones: recordatorios que arma el propio teléfono; no usamos un servicio de envío de notificaciones. La app no pide tu ubicación ni usa el micrófono.</p>
+<p>Cámara y fotos o archivos: solo para fotografiar o elegir tu recibo o tu convenio, o para elegir tu respaldo (.chx) cuando lo importás. Huella o rostro: para desbloquear la app; la huella queda en el teléfono, la app solo recibe un «sí» o «no». Notificaciones: recordatorios que arma el propio teléfono; no usamos un servicio de envío de notificaciones. La app no pide tu ubicación ni usa el micrófono.</p>
 
 <h2>10. Publicidad y cookies</h2>
 <p>Mientras no pagues Pro o Pro+ (también durante la prueba), la app muestra anuncios de Google AdMob. Los pedimos NO personalizados: no se arman con tu perfil ni con tus datos de trabajo. No vendemos tus datos de trabajo ni los usamos para armar publicidad: lo único que llega a un servicio publicitario son los datos técnicos que figuran en la fila de AdMob.</p>
@@ -103,7 +104,7 @@
 <h2>12. Conservación y cómo borrar tus datos</h2>
 <p>Lo que está en tu teléfono se conserva hasta que lo borres. Podés eliminar tu cuenta y todos sus datos de este teléfono desde Ajustes › Cuenta › Eliminar mi cuenta (pide tu contraseña), empezar de cero conservando la cuenta desde Ajustes › Cuenta › Borrar todo y empezar de cero, o desinstalar la app.</p>
 <p>Quedan solo los datos del teléfono que no son de ninguna cuenta: un identificador al azar, la fecha de la primera apertura y los contadores de la prueba y de los escaneos de regalo, para que la prueba no se reinicie creando otra cuenta. En Android se borran al desinstalar la app; en iPhone quedan en el llavero del sistema, junto con la clave de cifrado, aunque la desinstales.</p>
-<p>Borrar la cuenta no borra el respaldo .chx que hayas guardado en otro lado, ni cancela una suscripción: para eso está el acceso «Baja y arrepentimiento» (punto 16). En nuestro servidor quedan las constancias de tus consentimientos, una por cada uso de la IA: cada una se conserva 5 años, porque es la prueba de que nos autorizaste y ese es el plazo para reclamar por ella (art. 2560 del Código Civil y Comercial); no contienen tu recibo ni tus preguntas. El contador de usos se descarta solo al mes siguiente. Lo que conservamos lo borramos cuando deja de ser necesario para lo que dice este punto.</p>
+<p>Borrar la cuenta no borra el respaldo .chx que hayas guardado en otro lado, ni cancela una suscripción: para eso está el acceso «Baja y arrepentimiento» (punto 16). En nuestro servidor quedan las constancias de tus consentimientos, una por cada uso de la IA: cada una se conserva 5 años, porque es la prueba de que nos autorizaste y ese es el plazo para reclamar por ella (art. 2560 del Código Civil y Comercial); no contienen tu recibo, tus preguntas ni tu convenio. Las lecturas de convenios que guarda el servidor no están asociadas a vos: no sabemos quién subió cada una. El contador de usos se descarta solo al mes siguiente. Lo que conservamos lo borramos cuando deja de ser necesario para lo que dice este punto.</p>
 <p>En iPhone, tus datos cifrados y los archivos que exportás pueden quedar en la copia de iCloud que configura tu teléfono.</p>
 
 <h2>13. Menores de edad</h2>
@@ -112,9 +113,9 @@
 <h2>14. Tus derechos</h2>
 <p>Tenés derecho a saber si tratamos datos tuyos y a acceder a ellos; a pedir que se rectifiquen, actualicen o supriman; a oponerte a un tratamiento; a retirar un consentimiento (lo hecho antes de retirarlo sigue siendo válido); y a pedir que bloqueemos un dato mientras se resuelve un pedido tuyo. También podés consultar el Registro Nacional de Bases de Datos, que lleva la Agencia de Acceso a la Información Pública y es de consulta pública y gratuita.</p>
 <p>En la app, Ajustes › La app › Privacidad tiene un botón para cada pedido y muestra tu identificador, que es el dato con el que encontramos lo que guarda el servidor.</p>
-<p>Si revocás el permiso del escaneo o del asistente, la app deja de enviar datos desde ese momento; lo ya procesado no se puede recuperar porque no se guardó.</p>
+<p>Si revocás el permiso del escaneo, del asistente o de la lectura del convenio, la app deja de enviar datos desde ese momento; lo ya procesado no se puede recuperar porque no se guardó.</p>
 <p>Podés pedir acceso a tus datos, y que los corrijamos o los suprimamos, escribiendo a sueldoenmano.app@gmail.com. Respondemos los pedidos de acceso dentro de los 10 días corridos y los de rectificación o supresión dentro de los 5 días hábiles (arts. 14 y 16 de la Ley 25.326). El acceso es gratuito si lo pedís con intervalos de seis meses o más, salvo que acredites un interés legítimo.</p>
-<p>Como casi todo vive en tu teléfono, la mayoría de estos derechos los ejercés directamente desde la app. Podés revocar los permisos del escaneo y del asistente cuando quieras en Ajustes › La app › Privacidad.</p>
+<p>Como casi todo vive en tu teléfono, la mayoría de estos derechos los ejercés directamente desde la app. Podés revocar los permisos del escaneo, del asistente y de la lectura del convenio cuando quieras en Ajustes › La app › Privacidad.</p>
 <p>La AGENCIA DE ACCESO A LA INFORMACIÓN PÚBLICA, en su carácter de Órgano de Control de la Ley N° 25.326, tiene la atribución de atender las denuncias y reclamos que interpongan quienes resulten afectados en sus derechos por incumplimiento de las normas vigentes en materia de protección de datos personales. Su domicilio es Av. Pte. Julio A. Roca 710, Ciudad Autónoma de Buenos Aires.</p>
 
 <h2>15. Los principios que seguimos</h2>
@@ -133,7 +134,7 @@
 
 <h2>17. Cambios en esta política</h2>
 <p>Cada versión lleva número y fecha y se publica en <a href="https://leososa01.github.io/sueldo-en-mano-legal/">https://leososa01.github.io/sueldo-en-mano-legal/</a>. Si un cambio es relevante, te lo avisamos en la app (en sus novedades, o al pedirte que aceptes de nuevo los términos). Nunca la vamos a cambiar para proteger menos tus datos.</p>
-<p>Versión anterior: <a href="https://leososa01.github.io/sueldo-en-mano-legal/politica-v2.html">versión 2, del 19 de septiembre de 2026</a>.</p>
+<p>Versiones anteriores: <a href="https://leososa01.github.io/sueldo-en-mano-legal/politica-v3.html">versión 3, del 16 de octubre de 2026</a>; <a href="https://leososa01.github.io/sueldo-en-mano-legal/politica-v2.html">versión 2, del 19 de septiembre de 2026</a>.</p>
 
 <h2>18. Definiciones</h2>
 <ul>
@@ -146,6 +147,6 @@
 
 <h2>19. Contacto</h2>
 <p>Leonardo Joaquín Sosa Escobar · CUIT 20-38942828-1 · Almirante Brown 3666, Garín, Partido de Escobar, Provincia de Buenos Aires · sueldoenmano.app@gmail.com. Si escribís por tus datos, poné en el asunto «Datos personales».</p>
-<footer>Sueldo en Mano — Política de privacidad · versión 3 · 16 de octubre de 2026</footer>
+<footer>Sueldo en Mano — Política de privacidad · versión 4 · 27 de octubre de 2026</footer>
 </body>
 </html>
