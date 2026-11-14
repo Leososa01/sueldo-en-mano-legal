@@ -1,11 +1,11 @@
 {
-  "version": 9,
+  "version": 10,
   "vigenciaDesde": "2026-07-01",
-  "actualizado": "2026-10-26",
+  "actualizado": "2026-11-14",
   "fuentes": {
     "escala": "https://www.afip.gob.ar/gananciasYBienes/ganancias/personas-humanas-sucesiones-indivisas/declaracion-jurada/documentos/Tabla-Art-94-LIG-per-jul-a-dic-2026.pdf",
     "deducciones": "https://www.afip.gob.ar/gananciasYBienes/ganancias/personas-humanas-sucesiones-indivisas/deducciones/documentos/Deducciones-personales-art-30-jul-dic-2026.pdf",
-    "topeSipa": "Movilidad DNU 274/2024 = IPC INDEC de M-2 (datos.gob.ar, serie 148.3_INIVELNAL_DICI_M_26). Calculado por el robot: 2026-09: 2.11%, 2026-10: 1.66%. Reproduce al centavo las Res. ANSES 2026.",
+    "topeSipa": "Movilidad DNU 274/2024 = IPC INDEC de M-2 (datos.gob.ar, serie 148.3_INIVELNAL_DICI_M_26). Calculado por el robot: 2026-11: 1.93%. Reproduce al centavo las Res. ANSES 2026.",
     "topeSeguroVida": "Art. 85 inc. b LIG - tope anual del periodo fiscal 2026 (se actualiza por IPC cada anio fiscal)",
     "diasNoLaborables": "Art. 7 Ley 27.399: hasta 3 días no laborables con fines turísticos por año. NO son feriados (art. 167 LCT: si se trabaja se paga como día común). Los publica el robot de feriados con el calendario oficial, solo los que quedan por delante.",
     "feriados": "Calendario oficial de Jefatura de Gabinete (argentina.gob.ar/jefatura/feriados-nacionales-AAAA, holidays-AAAA-es.json), controlado contra ArgentinaDatos. Robot diario (scripts/feriados.py). Años decretados al 2026-10-26: 2026."
@@ -68,13 +68,14 @@
     ]
   },
   "aportes": {
-    "baseImponibleTope": 4769631.49,
-    "vigenciaDesde": "2026-10-01",
+    "baseImponibleTope": 4861685.38,
+    "vigenciaDesde": "2026-11-01",
     "historico": {
       "2026-07": 4509567.41,
       "2026-08": 4594798.23,
       "2026-09": 4691748.47,
-      "2026-10": 4769631.49
+      "2026-10": 4769631.49,
+      "2026-11": 4861685.38
     }
   },
   "diasNoLaborables": [
