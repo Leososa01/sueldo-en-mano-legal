@@ -11,6 +11,11 @@ name: Tope SIPA del mes (automático)
 #
 # Corre todos los días a las 09:00 de Argentina. Los días que el tope del mes
 # ya está publicado no hace nada. El 1 de cada mes aparece el tope nuevo.
+#
+# Avisa con un issue (17/11/2026) si el robot falla y si el día 5 el tope del
+# mes todavía no salió: el de noviembre de 2026 llegó recién el 14/11, con el
+# robot en verde todos los días, porque a la API le faltaba el IPC. El aviso
+# del atraso se cierra solo cuando el tope sale.
 
 on:
   schedule:
@@ -19,6 +24,7 @@ on:
 
 permissions:
   contents: write
+  issues: write
 
 concurrency:
   group: tope-sipa
@@ -38,7 +44,13 @@ jobs:
         run: pip install requests
 
       - name: Calcular el tope del mes con el IPC del INDEC
-        run: python scripts/tope_sipa.py
+        # El error queda en un archivo para que el issue de abajo lo cuente.
+        run: |
+          set +e
+          python scripts/tope_sipa.py 2> error-robot.txt
+          estado=$?
+          cat error-robot.txt >&2
+          exit $estado
 
       - name: Publicar si cambió
         run: |
@@ -54,3 +66,64 @@ jobs:
           git add parametros.json
           git commit -m "Pizarra v${VERSION}: tope SIPA de ${MES} = ${TOPE} (robot, IPC INDEC)"
           git push
+
+      - name: Avisar si el tope del mes está atrasado
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ ! -f atraso-tope-sipa.txt ]; then
+            exit 0
+          fi
+          MES=$(head -n 1 atraso-tope-sipa.txt)
+          TITULO="El tope del SIPA de $MES todavía no salió"
+          if [ -n "$(gh issue list --state open --search "in:title \"$TITULO\"" --json number --jq '.[].number')" ]; then
+            echo "Ya hay un issue abierto."
+            exit 0
+          fi
+          {
+            tail -n +2 atraso-tope-sipa.txt
+            echo
+            echo "A quien gana más que el tope, la app le calcula los aportes con el tope del mes anterior, que es más bajo: le descuenta un poco menos y el neto le da un poco de más."
+            echo
+            echo "No hace falta hacer nada: cuando aparezca el IPC, el robot publica el tope solo y este issue se cierra solo."
+            echo "Si no querés esperar y ANSES ya publicó la resolución del mes, cargalo a mano: Actions › «Actualizar parámetros fiscales» › Run workflow, con el tope y el mes (abre un PR para revisar)."
+          } > cuerpo.md
+          gh issue create --title "$TITULO" --body-file cuerpo.md
+
+      - name: Cerrar el aviso del atraso cuando el tope sale
+        if: success()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ -f atraso-tope-sipa.txt ]; then
+            exit 0
+          fi
+          TOPE=$(python -c "import json; a=json.load(open('parametros.json'))['aportes']; print(a['vigenciaDesde'][:7], a['baseImponibleTope'])")
+          for N in $(gh issue list --state open --search 'in:title "El tope del SIPA de" "todavía no salió"' --json number --jq '.[].number'); do
+            gh issue close "$N" --comment "Ya salió: el tope vigente es el de ${TOPE% *} = ${TOPE#* } (lo publicó el robot)."
+          done
+
+      - name: Avisar si el robot falló
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TITULO="El robot del tope del SIPA falló"
+          if [ -n "$(gh issue list --state open --search "in:title \"$TITULO\"" --json number --jq '.[].number')" ]; then
+            echo "Ya hay un issue abierto: no se repite cada día."
+            exit 0
+          fi
+          {
+            echo "El robot del tope del SIPA terminó con error y no publicó nada (la pizarra quedó como estaba)."
+            echo
+            echo "Corrida: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            echo
+            if [ -s error-robot.txt ]; then
+              echo '```'
+              tail -n 20 error-robot.txt
+              echo '```'
+            fi
+            echo
+            echo "Mientras siga así, la app no toma el tope de los meses nuevos (ni el del seguro de vida en enero). Cerrá este issue cuando quede arreglado: si vuelve a fallar, se abre otro."
+          } > cuerpo.md
+          gh issue create --title "$TITULO" --body-file cuerpo.md

@@ -1,5 +1,10 @@
 name: Actualizar parámetros fiscales
 
+# Avisa con un issue si el robot falla (17/11/2026): hasta entonces, si ARCA
+# cambiaba el nombre de un PDF, el robot fallaba todos los lunes sin que nadie
+# se enterara. En enero y en julio, las dos primeras semanas sin los PDF del
+# semestre nuevo no son una falla: el robot espera (ver el script).
+
 on:
   schedule:
     # Todos los lunes, 13:00 UTC (10:00 Argentina, una hora después del tope
@@ -22,6 +27,7 @@ on:
 permissions:
   contents: write
   pull-requests: write
+  issues: write
 
 jobs:
   actualizar:
@@ -38,10 +44,17 @@ jobs:
 
       - name: Bajar PDFs de ARCA y regenerar parametros.json
         id: robot
-        run: >-
-          python scripts/actualizar_parametros.py
-          "${{ github.event.inputs.tope_sipa }}"
-          "${{ github.event.inputs.mes_tope }}"
+        # Lo que se escribe a mano entra por variables, no pegado en el comando.
+        # El error queda en un archivo para que el issue de abajo lo cuente.
+        env:
+          TOPE_SIPA: ${{ github.event.inputs.tope_sipa }}
+          MES_TOPE: ${{ github.event.inputs.mes_tope }}
+        run: |
+          set +e
+          python scripts/actualizar_parametros.py "$TOPE_SIPA" "$MES_TOPE" 2> error-robot.txt
+          estado=$?
+          cat error-robot.txt >&2
+          exit $estado
 
       - name: Publicar solo si es una actualización por IPC pareja
         if: steps.robot.outputs.directo == 'true'
@@ -72,3 +85,28 @@ jobs:
             valores nuevos al abrir con internet.
           branch: robot/parametros-fiscales
           delete-branch: true
+
+      - name: Avisar si el robot falló
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TITULO="El robot de las tablas de ARCA falló"
+          if [ -n "$(gh issue list --state open --search "in:title \"$TITULO\"" --json number --jq '.[].number')" ]; then
+            echo "Ya hay un issue abierto: no se repite cada lunes."
+            exit 0
+          fi
+          {
+            echo "El robot de las tablas de Ganancias de ARCA terminó con error y no publicó nada (la pizarra quedó como estaba)."
+            echo
+            echo "Corrida: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            echo
+            if [ -s error-robot.txt ]; then
+              echo '```'
+              tail -n 20 error-robot.txt
+              echo '```'
+            fi
+            echo
+            echo "Mientras siga así, la app no toma las tablas nuevas de Ganancias (la escala y las deducciones del semestre). Cerrá este issue cuando quede arreglado: si vuelve a fallar, se abre otro."
+          } > cuerpo.md
+          gh issue create --title "$TITULO" --body-file cuerpo.md

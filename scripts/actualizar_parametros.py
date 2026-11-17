@@ -19,7 +19,14 @@ actualizar automáticamente hazlo»):
 El script lo avisa por GITHUB_OUTPUT (directo=true/false).
 
 Si algo no se puede leer o no cierra, el script termina con error y NO toca
-nada (la app sigue con los últimos valores buenos).
+nada (la app sigue con los últimos valores buenos). El workflow abre un issue
+cuando falla (17/11/2026).
+
+EL SEMESTRE NUEVO (17/11/2026). En enero y en julio los PDF del semestre
+pueden tardar en salir, y ARCA contesta 404. Hasta el día DIAS_DE_ESPERA de
+ese mes es esperar, no un error: se termina sin tocar nada y se prueba el
+lunes siguiente. Después sí es un error (y un issue): o ARCA no los publicó,
+o les cambió el nombre y hay que corregir urls_semestre().
 
 BUG ARREGLADO (26/10/2026): en el primer semestre el robot multiplicaba por 2
 lo que leía, creyendo que el PDF de enero a junio traía los acumulados a
@@ -36,6 +43,7 @@ import json
 import os
 import re
 import sys
+import traceback
 from datetime import date
 
 import pdfplumber
@@ -45,9 +53,17 @@ BASE = "https://www.afip.gob.ar/gananciasYBienes/ganancias/personas-humanas-suce
 
 ALICUOTAS = [0.05, 0.09, 0.12, 0.15, 0.19, 0.23, 0.27, 0.31, 0.35]
 
+DIAS_DE_ESPERA = 14
+
+
+class TodaviaNoSalio(Exception):
+    """ARCA contesta 404 al PDF del semestre."""
+
 
 def bajar(url):
     r = requests.get(url, timeout=60)
+    if r.status_code == 404:
+        raise TodaviaNoSalio(url)
     r.raise_for_status()
     if not r.content.startswith(b"%PDF"):
         raise RuntimeError(f"No es un PDF: {url}")
@@ -289,5 +305,25 @@ def main():
     print(f"parametros.json actualizado a la versión {nuevo['version']}")
 
 
+def esperando_el_semestre(hoy):
+    return hoy.month in (1, 7) and hoy.day <= DIAS_DE_ESPERA
+
+
 if __name__ == "__main__":
-    main()
+    try:
+        main()
+    except TodaviaNoSalio as e:
+        if esperando_el_semestre(date.today()):
+            print(f"Las tablas del semestre todavía no están en ARCA ({e}): se prueba el lunes que viene.")
+            sys.exit(0)
+        print(
+            f"ERROR, no se tocó nada: ARCA no tiene el PDF del semestre en la dirección de siempre ({e}). "
+            "O todavía no lo publicó, o le cambió el nombre: si lo encontrás en el sitio de ARCA con otro "
+            "nombre, hay que corregir urls_semestre() en scripts/actualizar_parametros.py.",
+            file=sys.stderr,
+        )
+        sys.exit(1)
+    except Exception as e:  # noqa: BLE001
+        traceback.print_exc()
+        print(f"ERROR, no se tocó nada: {e}", file=sys.stderr)
+        sys.exit(1)

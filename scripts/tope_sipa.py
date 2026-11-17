@@ -14,6 +14,12 @@ nacional, base dic-2016). Si la API no responde o el número no cierra, el
 script termina con error y NO toca nada: la app sigue con el último tope
 bueno.
 
+EL ATRASO (17/11/2026). Si a la API todavía le falta el IPC de M-2, el
+script espera sin error. Así quedó el tope de noviembre de 2026: del 1 al
+14/11 el robot estuvo en verde todos los días sin el tope del mes. Desde el
+día DIA_LIMITE, si el tope del mes sigue sin salir, deja ATRASO escrito
+(primera línea: el mes; después, la explicación) y el workflow abre un issue.
+
 Lo que escribe en parametros.json:
   aportes.baseImponibleTope  el tope del mes en curso (o del último calculable)
   aportes.vigenciaDesde      "AAAA-MM-01" de ese tope
@@ -46,6 +52,10 @@ import requests
 
 SERIE_IPC = "148.3_INIVELNAL_DICI_M_26"  # IPC nivel general nacional, base dic-2016
 API = "https://apis.datos.gob.ar/series/api/series/"
+ATRASO = "atraso-tope-sipa.txt"
+# El IPC de M-2 lo publica el INDEC a mediados de M-1: el día 1 ya tendría que
+# estar. Cinco días de margen por si la API de datos.gob.ar tarda en tomarlo.
+DIA_LIMITE = 5
 
 
 def r2(x):
@@ -174,8 +184,22 @@ def main():
             f"Calculado por el robot: {detalle}. Reproduce al centavo las Res. ANSES 2026."
         )
 
+    mes_hoy = hoy.strftime("%Y-%m")
+    if ultimo < mes_hoy:
+        falta = mes_siguiente(ultimo)
+        ipc_que_falta = mes_menos(falta, 2)
+        print(f"El tope de {falta} todavía no se puede calcular: a datos.gob.ar le falta el IPC de {ipc_que_falta}.")
+        if hoy.day >= DIA_LIMITE:
+            with open(ATRASO, "w", encoding="utf-8") as f:
+                f.write(f"{falta}\n")
+                f.write(
+                    f"Hoy es {hoy.isoformat()} y el tope del SIPA de {falta} todavía no salió: la API de "
+                    f"datos.gob.ar (serie {SERIE_IPC}) no tiene el IPC de {ipc_que_falta}, que el INDEC "
+                    f"publica a mediados del mes anterior. La app sigue con el tope de {ultimo}.\n"
+                )
+
     if nuevo["aportes"] == actual.get("aportes") and not seguro:
-        print(f"Sin cambios: el tope de {ultimo} ya está publicado.")
+        print(f"Sin cambios: el último tope publicado es el de {ultimo}.")
         return
 
     nuevo["version"] = actual["version"] + 1
