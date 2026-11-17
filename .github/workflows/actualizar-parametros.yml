@@ -33,9 +33,9 @@ jobs:
   actualizar:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v4
+      - uses: actions/checkout@v5
 
-      - uses: actions/setup-python@v5
+      - uses: actions/setup-python@v6
         with:
           python-version: "3.12"
 
@@ -70,7 +70,7 @@ jobs:
 
       - name: Abrir Pull Request si hay cambios que revisar
         if: steps.robot.outputs.directo != 'true'
-        uses: peter-evans/create-pull-request@v6
+        uses: peter-evans/create-pull-request@v8
         with:
           commit-message: "Parámetros fiscales nuevos (ARCA/ANSES)"
           title: "📊 Parámetros fiscales nuevos — revisar y aprobar"
