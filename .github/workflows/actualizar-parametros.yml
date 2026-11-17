@@ -45,15 +45,16 @@ jobs:
       - name: Bajar PDFs de ARCA y regenerar parametros.json
         id: robot
         # Lo que se escribe a mano entra por variables, no pegado en el comando.
-        # El error queda en un archivo para que el issue de abajo lo cuente.
+        # El error queda en un archivo FUERA del repo para que el issue de abajo lo
+        # cuente (adentro, el paso del PR lo tomaba como un cambio).
         env:
           TOPE_SIPA: ${{ github.event.inputs.tope_sipa }}
           MES_TOPE: ${{ github.event.inputs.mes_tope }}
         run: |
           set +e
-          python scripts/actualizar_parametros.py "$TOPE_SIPA" "$MES_TOPE" 2> error-robot.txt
+          python scripts/actualizar_parametros.py "$TOPE_SIPA" "$MES_TOPE" 2> "$RUNNER_TEMP/error-robot.txt"
           estado=$?
-          cat error-robot.txt >&2
+          cat "$RUNNER_TEMP/error-robot.txt" >&2
           exit $estado
 
       - name: Publicar solo si es una actualización por IPC pareja
@@ -85,6 +86,8 @@ jobs:
             valores nuevos al abrir con internet.
           branch: robot/parametros-fiscales
           delete-branch: true
+          # Solo la pizarra: cualquier otro archivo que quede en la carpeta no va.
+          add-paths: parametros.json
 
       - name: Avisar si el robot falló
         if: failure()
@@ -101,9 +104,9 @@ jobs:
             echo
             echo "Corrida: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
             echo
-            if [ -s error-robot.txt ]; then
+            if [ -s "$RUNNER_TEMP/error-robot.txt" ]; then
               echo '```'
-              tail -n 20 error-robot.txt
+              tail -n 20 "$RUNNER_TEMP/error-robot.txt"
               echo '```'
             fi
             echo

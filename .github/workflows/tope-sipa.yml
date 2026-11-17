@@ -44,12 +44,13 @@ jobs:
         run: pip install requests
 
       - name: Calcular el tope del mes con el IPC del INDEC
-        # El error queda en un archivo para que el issue de abajo lo cuente.
+        # El error queda en un archivo FUERA del repo para que el issue de abajo lo
+        # cuente (adentro, el paso del PR lo tomaba como un cambio).
         run: |
           set +e
-          python scripts/tope_sipa.py 2> error-robot.txt
+          python scripts/tope_sipa.py 2> "$RUNNER_TEMP/error-robot.txt"
           estado=$?
-          cat error-robot.txt >&2
+          cat "$RUNNER_TEMP/error-robot.txt" >&2
           exit $estado
 
       - name: Publicar si cambió
@@ -118,9 +119,9 @@ jobs:
             echo
             echo "Corrida: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
             echo
-            if [ -s error-robot.txt ]; then
+            if [ -s "$RUNNER_TEMP/error-robot.txt" ]; then
               echo '```'
-              tail -n 20 error-robot.txt
+              tail -n 20 "$RUNNER_TEMP/error-robot.txt"
               echo '```'
             fi
             echo
