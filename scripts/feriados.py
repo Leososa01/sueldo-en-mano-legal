@@ -42,7 +42,14 @@ Lo que escribe en parametros.json:
   feriadosRegionales  [{fecha, nombre, donde}]: feriados que rigen solo en
                       algunas provincias ("especial" en el calendario). La app
                       no sabe dónde trabaja cada uno: se los ofrece para que
-                      los marque como propios con un toque.
+                      los marque como propios con un toque. El calendario
+                      escribe el lugar dentro del nombre, con paréntesis
+                      («… (feriado en X)») o, desde noviembre de 2026, sin
+                      ellos («… feriado en X»): se aceptan los dos. Si un
+                      especial no se entiende, los regionales de ese año
+                      quedan como estaban y se anota en dudas-feriados.txt
+                      (el workflow abre un issue); los nacionales y los
+                      puentes, que son los que cambian la plata, siguen.
 No escribe los días no laborables religiosos ("no_laborable"): rigen solo
 para quien profesa ese culto y la app no puede saberlo.
 
@@ -66,6 +73,7 @@ import requests
 
 OFICIAL = "https://www.argentina.gob.ar/sites/default/files/holidays-{anio}-es.json"
 DESACUERDOS = "desacuerdos-feriados.txt"
+DUDAS = "dudas-feriados.txt"
 ARGENTINA_DATOS = "https://api.argentinadatos.com/v1/feriados/{anio}"
 
 INAMOVIBLES_FIJOS = ["01-01", "03-24", "04-02", "05-01", "05-25", "06-20", "07-09", "12-08", "12-25"]
@@ -105,9 +113,27 @@ def bajar_argentina_datos(anio):
     return r.json()
 
 
+# «Nombre (feriado en X)» o «Nombre feriado en X»: el calendario oficial
+# dejó los paréntesis en noviembre de 2026 y el robot quedó en rojo del 10/11
+# al 16/11 sin publicar nada.
+DONDE_RIGE = re.compile(r"^(.*?)\s*(?:\(\s*)?feriado en (.+?)(?:\s*\))?\s*$", re.I)
+
+
+def leer_especial(d):
+    """{fecha, nombre, donde} de un feriado regional, o None si no se entiende dónde rige."""
+    m = DONDE_RIGE.match(d["nombre"])
+    if not m or not m.group(1).strip() or not m.group(2).strip():
+        return None
+    return {"fecha": d["fecha"], "nombre": m.group(1).strip(), "donde": m.group(2).strip()}
+
+
 def separar(anio, oficial):
-    """Los nacionales, los puentes y los regionales de un año, ya validados."""
-    nacionales, puentes, regionales = {}, set(), []
+    """Los nacionales, los puentes y los regionales de un año, ya validados.
+
+    El cuarto valor son los especiales que no se entendieron: si hay alguno,
+    los regionales de ese año no se tocan.
+    """
+    nacionales, puentes, regionales, dudas = {}, set(), [], []
     for d in oficial:
         if d["tipo"] in TIPOS_NACIONALES:
             # Un mismo día puede venir dos veces (02/04/2026: Malvinas y Jueves
@@ -116,10 +142,11 @@ def separar(anio, oficial):
         elif d["tipo"] == "turistico":
             puentes.add(d["fecha"])
         elif d["tipo"] == "especial":
-            m = re.match(r"^(.*?)\s*\(\s*feriado en (.+?)\s*\)\s*$", d["nombre"], re.I)
-            if not m:
-                raise RuntimeError(f"{anio}: no entiendo dónde rige el especial del {d['fecha']}: {d['nombre']}")
-            regionales.append({"fecha": d["fecha"], "nombre": m.group(1), "donde": m.group(2)})
+            especial = leer_especial(d)
+            if especial is None:
+                dudas.append(f"{anio}: no entiendo dónde rige el especial del {d['fecha']}: {d['nombre']}")
+            else:
+                regionales.append(especial)
 
     faltan = [f for f in INAMOVIBLES_FIJOS if f"{anio}-{f}" not in nacionales]
     if faltan:
@@ -130,7 +157,7 @@ def separar(anio, oficial):
     for p in puentes:
         if p in nacionales or date.fromisoformat(p).weekday() >= 5:
             raise RuntimeError(f"{anio}: el puente del {p} cae en feriado o fin de semana")
-    return nacionales, puentes, regionales
+    return nacionales, puentes, regionales, dudas
 
 
 def desacuerdo(anio, nacionales, puentes, otra):
@@ -160,13 +187,13 @@ def main():
     for d in actual.get("feriadosRegionales") or []:
         regionales_por_anio.setdefault(d["fecha"][:4], []).append(d)
 
-    decretados, desacuerdos = [], []
+    decretados, desacuerdos, dudas_todas = [], [], []
     for anio in (hoy.year, hoy.year + 1):
         oficial = bajar_oficial(anio)
         if oficial is None:
             print(f"{anio}: todavía no está decretado; la app sigue con la ley.")
             continue
-        nacionales, puentes, regionales = separar(anio, oficial)
+        nacionales, puentes, regionales, dudas = separar(anio, oficial)
         distinto = desacuerdo(anio, nacionales, puentes, bajar_argentina_datos(anio))
         if distinto:
             print(f"Las fuentes no coinciden, {anio} queda como estaba: {distinto}")
@@ -184,12 +211,20 @@ def main():
             if p >= hoy_iso:
                 conservados.setdefault(p, {"fecha": p, "nombre": NOMBRE_PUENTE})
         puentes_por_anio[str(anio)] = [conservados[f] for f in sorted(conservados)]
-        regionales_por_anio[str(anio)] = sorted(regionales, key=lambda d: (d["fecha"], d["donde"]))
+        if dudas:
+            # Los regionales de este año quedan como estaban; lo demás sigue.
+            print(f"{anio}: hay especiales que no entiendo, los regionales quedan como estaban")
+            dudas_todas.extend(dudas)
+        else:
+            regionales_por_anio[str(anio)] = sorted(regionales, key=lambda d: (d["fecha"], d["donde"]))
         decretados.append(anio)
 
     if desacuerdos:
         with open(DESACUERDOS, "w", encoding="utf-8") as f:
             f.write("\n".join(desacuerdos) + "\n")
+    if dudas_todas:
+        with open(DUDAS, "w", encoding="utf-8") as f:
+            f.write("\n".join(dudas_todas) + "\n")
 
     nuevo = json.loads(json.dumps(actual))
     nuevo["feriadosNacionales"] = dict(sorted(feriados.items()))

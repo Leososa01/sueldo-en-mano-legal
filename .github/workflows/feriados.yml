@@ -6,7 +6,9 @@ name: Feriados del año (automático)
 # ArgentinaDatos (ver scripts/feriados.py). Cuando las dos fuentes coinciden
 # publica solo, como el tope del SIPA: commit directo a main, sin PR.
 # Cuando no coinciden, ese año no se toca y se abre un issue para que lo mire
-# una persona.
+# una persona. También abre un issue si el robot falla o si hay un feriado
+# regional que no entiende: del 10/11 al 16/11/2026 estuvo en rojo todos los
+# días sin que nadie se enterara (el correo de GitHub no se mira).
 #
 # Corre todos los días a las 09:30 de Argentina (media hora después del tope
 # del SIPA, para no pisarse al hacer push). Los días sin novedades no hace nada.
@@ -38,7 +40,8 @@ jobs:
         run: pip install requests
 
       - name: Leer el calendario oficial y controlarlo
-        run: python scripts/feriados.py
+        # El error queda en un archivo para que el issue de abajo lo cuente.
+        run: python scripts/feriados.py 2> error-feriados.txt || { cat error-feriados.txt; exit 1; }
 
       - name: Publicar si cambió
         run: |
@@ -74,5 +77,51 @@ jobs:
             echo
             echo "Mirá el calendario oficial (argentina.gob.ar/jefatura/feriados-nacionales-AAAA) y el decreto."
             echo "Mientras tanto, la app sigue con lo que había publicado (o con su cálculo por la ley)."
+          } > cuerpo.md
+          gh issue create --title "$TITULO" --body-file cuerpo.md
+
+      - name: Avisar si hay un feriado regional que no entiende
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          if [ ! -f dudas-feriados.txt ]; then
+            exit 0
+          fi
+          TITULO="Feriados: hay un feriado regional que el robot no entiende"
+          if [ -n "$(gh issue list --state open --search "in:title \"$TITULO\"" --json number --jq '.[].number')" ]; then
+            echo "Ya hay un issue abierto."
+            exit 0
+          fi
+          {
+            echo "El robot publicó los feriados nacionales y los puentes, pero dejó los regionales de ese año como estaban porque no entendió dónde rige alguno:"
+            echo
+            sed 's/^/- /' dudas-feriados.txt
+            echo
+            echo "Seguramente el calendario oficial cambió cómo escribe el lugar. Hay que enseñárselo a leer_especial() en scripts/feriados.py."
+          } > cuerpo.md
+          gh issue create --title "$TITULO" --body-file cuerpo.md
+
+      - name: Avisar si el robot falló
+        if: failure()
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TITULO="El robot de feriados falló"
+          if [ -n "$(gh issue list --state open --search "in:title \"$TITULO\"" --json number --jq '.[].number')" ]; then
+            echo "Ya hay un issue abierto: no se repite cada día."
+            exit 0
+          fi
+          {
+            echo "El robot de feriados terminó con error y no publicó nada (la pizarra quedó como estaba)."
+            echo
+            echo "Corrida: ${{ github.server_url }}/${{ github.repository }}/actions/runs/${{ github.run_id }}"
+            echo
+            if [ -s error-feriados.txt ]; then
+              echo '```'
+              tail -n 20 error-feriados.txt
+              echo '```'
+            fi
+            echo
+            echo "Mientras siga así, la app no toma un decreto de feriados nuevo. Cerrá este issue cuando quede arreglado: si vuelve a fallar, se abre otro."
           } > cuerpo.md
           gh issue create --title "$TITULO" --body-file cuerpo.md
